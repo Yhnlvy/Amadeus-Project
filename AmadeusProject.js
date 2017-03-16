@@ -47,7 +47,7 @@ $(function () {
     $("#airport").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: "http://api.sandbox.amadeus.com/v1.2/airports/autocomplete"
+                url: "https://api.sandbox.amadeus.com/v1.2/airports/autocomplete"
                 , dataType: "json"
                 , data: {
                     apikey: APIkey
@@ -76,7 +76,7 @@ $(function () {
 });
 // API CALL - Inspiration Search
 function search() {
-    var s = "http://api.sandbox.amadeus.com/v1.2/flights/inspiration-search";
+    var s = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search";
     var or = $("#airport").val();
     var dur = getDuration();
     var budget = $("#maxPrice").val();
