@@ -18,6 +18,7 @@ $(document).ready(function () {
         search();
     });
 });
+
 // DATEPICKER - SETUP & OPTIONS
 function initDatepicker() {
     $("#datepicker").datepicker();
