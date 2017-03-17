@@ -2,6 +2,7 @@
 var APIkey = "khGmpnq38hCbcGKE6PQ9qOFVYgdiJAsv";
 var airlines, airports;
 var dep = "";
+
 $(document).ready(function () {
     initDatepicker();
     loadData();
@@ -17,6 +18,7 @@ $(document).ready(function () {
         search();
     });
 });
+
 // DATEPICKER - SETUP & OPTIONS
 function initDatepicker() {
     $("#datepicker").datepicker();
