@@ -1,70 +1,75 @@
 'use strict';
-var APIkey = "khGmpnq38hCbcGKE6PQ9qOFVYgdiJAsv";
-var airlines, airports;
-var dep = "";
+var AmadeusAPIkey = "";
+// CONFIG - LOCAL SERVER (Loopback project)
+var host = "http://127.0.0.1";
+var port = ":4006";
+// DATA STORAGE VARIABLES
+var airlinesDict, airportsDict;
+var departureLocation = "";
+// WHEN THE DOM IS READY
 $(document).ready(function () {
     initDatepicker();
-    loadData();
-    $("#datepicker").change(function () {
-        console.log($(this).val());
-        var currentDate = $("#datepicker").datepicker("getDate");
-        var date = $.datepicker.formatDate("yy-mm-dd", currentDate);
-        console.log(date);
-    });
+    loadDictionaries();
+    getAPIkey();
     $("#btn-search").click(function (e) {
         e.preventDefault();
+        $("#results").toggle(false);
         $("#results").empty();
         search();
     });
 });
+// SECURITY FEATURE - get Amadeus key stored on a remote server
+function getAPIkey() {
+    var endpointURL = host + port;
+    $.get(endpointURL + '/get-key', function (data) {
+        AmadeusAPIkey = data.key;
+        console.log(AmadeusAPIkey);
+    });
+}
 // DATEPICKER - SETUP & OPTIONS
 function initDatepicker() {
     $("#datepicker").datepicker();
+    // French translations for month names & short day names
     $("#datepicker").datepicker("option", "monthNames", ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Decembre"]);
     $("#datepicker").datepicker("option", "dayNamesMin", ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"]);
-    $("#datepicker").datepicker("option", "minDate", new Date(Date.now()));
+    // OPTIONS
+    $("#datepicker").datepicker("option", "minDate", new Date(Date.now())); // We do not allow past dates
     $("#datepicker").datepicker("option", "dateFormat", "dd/mm/yy");
-    $("#datepicker").datepicker({
-        onSelect: function (date) {
-            alert(date);
-        }
-    });
 }
 
-function flexDate(nDays) {
-    var res = $("#datepicker").datepicker("getDate");
-    res.setDate(res.getDate() + nDays);
-    return res;
+function addDaysToDate(nDays) {
+    var newDate = $("#datepicker").datepicker("getDate");
+    newDate.setDate(newDate.getDate() + nDays);
+    return newDate;
 }
 
 function parseDate(date) {
-    var res = new Date(date);
-    res = $.datepicker.formatDate("dd/mm/yy", res);
-    return res;
+    var parsedDate = new Date(date);
+    parsedDate = $.datepicker.formatDate("dd/mm/yy", parsedDate);
+    return parsedDate;
 }
 // AUTOCOMPLETE SYSTEM - Retrieve IATA Code of Departure Airport
 $(function () {
     $("#airport").autocomplete({
         source: function (request, response) {
+            var endpointURL = "https://api.sandbox.amadeus.com/v1.2/airports/autocomplete";
             $.ajax({
-                url: "https://api.sandbox.amadeus.com/v1.2/airports/autocomplete"
+                url: endpointURL
                 , dataType: "json"
                 , data: {
-                    apikey: APIkey
+                    apikey: AmadeusAPIkey
                     , term: request.term
                 }
                 , success: function (data) {
                     response(data);
-                    console.log(data);
                 }
             });
         }
         , minLength: 3
         , select: function (event, ui) {
-            dep = ui;
-            console.log(dep);
-            var res = ui.item.label;
-            $("#selected").text(res);
+            departureLocation = ui;
+            var departureAirport = ui.item.label;
+            $("#selected").text(departureAirport);
         }
         , open: function () {
             $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
@@ -76,88 +81,86 @@ $(function () {
 });
 // API CALL - Inspiration Search
 function search() {
-    var s = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search";
-    var or = $("#airport").val();
-    var dur = getDuration();
+    //var endpointURL = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search";
+    var endpointURL = host + port + '/get-results';
+    var origin = $("#airport").val();
+    var duration = getDuration();
     var budget = $("#maxPrice").val();
-    var dep = getDepRange();
+    var departureRange = getDepartureRange();
     $(".loader").show();
     $.ajax({
-        url: s
+        url: endpointURL
         , dataType: "json"
         , data: {
-            apikey: APIkey
-            , origin: or
-            , departure_date: dep
-            , duration: dur
+            origin: origin
+            , departure_date: departureRange
+            , duration: duration
             , max_price: budget
         }
-        , success: handleRes
+        , success: displayResults
         , error: handleError
     });
 }
 
-function getDepRange() {
-    var currentDep = $("#datepicker").datepicker("getDate");
-    var dep1 = $.datepicker.formatDate("yy-mm-dd", currentDep);
-    var days = Number($("#flexibility").val());
-    var dep2 = $.datepicker.formatDate("yy-mm-dd", flexDate(days));
-    return dep1 + "--" + dep2;
+function getDepartureRange() {
+    var departureDate = $("#datepicker").datepicker("getDate");
+    departureDate = $.datepicker.formatDate("yy-mm-dd", departureDate);
+    var nDays = Number($("#flexibility").val());
+    var lastDepartureDate = $.datepicker.formatDate("yy-mm-dd", addDaysToDate(nDays));
+    return departureDate + "--" + lastDepartureDate;
 }
 
 function getDuration() {
-    var dur = Number($("#duration").val());
-    return dur + "--" + dur;
+    var duration = Number($("#duration").val());
+    return duration + "--" + duration;
 }
 
-function handleRes(res) {
+function displayResults(res) {
     console.log(res);
     var currency = res.currency;
-    var data = res.results;
-    var nRes = data.length;
-    var moy = 0;
-    $.each(data, function (index, val) {
-        moy += Number(val.price);
-        val.currency = currency;
-        var airlineLong = getAirlineName(val.airline);
-        var airportInfos = getAirportInfos(val.destination);
+    var results = res.results;
+    var numberOfResults = results.length;
+    var mean = 0;
+    $.each(results, function (index, value) {
+        mean += Number(value.price);
+        value.currency = currency;
+        var airlineName = getAirlineName(value.airline);
+        var airportInfos = getAirportInfos(value.destination);
         if (airportInfos !== -1) {
-            val.city = airportInfos.city;
-            val.name = airportInfos.name;
-            val.country = airportInfos.country.toUpperCase();
+            value.city = airportInfos.city;
+            value.name = airportInfos.name;
+            value.country = airportInfos.country.toUpperCase();
         }
-        val.departure_date = parseDate(val.departure_date);
-        val.return_date = parseDate(val.return_date);
-        val.airlineLong = airlineLong;
-        var html = Mustache.render(cardTemplate, val);
-        $("#results").append(html);
+        value.departure_date = parseDate(value.departure_date);
+        value.return_date = parseDate(value.return_date);
+        value.airlineName = airlineName;
+        var htmlCardTemplate = Mustache.render(cardTemplate, value);
+        $("#results").append(htmlCardTemplate);
     });
     $("#results").toggle('slow');
     $(".loader").hide();
-    moy /= nRes;
-    moy = Math.round(moy);
-    console.log(moy);
+    mean /= numberOfResults;
+    mean = Math.round(mean);
 }
 
 function handleError(jqXHR, textStatus, errorThrown) {
     $(".loader").hide();
-    console.error(jqXHR.statusText + " " + jqXHR.status + " : " + jqXHR.responseJSON.message);
-    alert(jqXHR.responseJSON.message);
+    alert("No results found");
 }
 // LOAD AIRPORTS/AIRLINES JSON TO MATCH RESULTS SENT BY THE API
-function loadData() {
-    $.getJSON('airlines.json', function (data) {
-        airlines = data;
+function loadDictionaries() {
+    $.getJSON('airlines.json', function (dict) {
+        airlinesDict = dict;
         console.log("Airlines successfully loaded.");
     });
-    $.getJSON('airports.json', function (data) {
-        airports = data;
+    $.getJSON('airports.json', function (dict) {
+        airportsDict = dict;
         console.log("Airports successfully loaded.");
     });
 }
 
 function getAirlineName(code) {
-    var res = $.grep(airlines, function (e) {
+    var res = $.grep(airlinesDict, function (e) {
         return e.iata == code;
     });
     if ($.isEmptyObject(res) || typeof res == 'undefined') {
@@ -169,7 +172,7 @@ function getAirlineName(code) {
 }
 
 function getAirportInfos(code) {
-    var res = $.grep(airports, function (e) {
+    var res = $.grep(airportsDict, function (e) {
         return e.iata == code;
     });
     if ($.isEmptyObject(res) || typeof res == 'undefined') {
@@ -189,5 +192,5 @@ var cardTemplate = [
             , '<div class="panel-body" style="text-align: center;">'
                 , '<p> <i class="glyphicon glyphicon-calendar"></i> {{departure_date}} - {{return_date}}</p>'
             , '</div>'
-            , '<div class="panel-footer"> <small>AIRPORT : {{name}} ({{destination}}). By : {{airlineLong}} ({{airline}})</small> </div>'
+            , '<div class="panel-footer"> <small>AIRPORT : {{name}} ({{destination}}). By : {{airlineName}} ({{airline}})</small> </div>'
         , '</div>'].join("\n");

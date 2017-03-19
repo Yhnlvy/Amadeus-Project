@@ -1,0 +1,418 @@
+paths:
+  /keys:
+    post:
+      tags:
+        - keys
+      summary: Create a new instance of the model and persist it into the data source.
+      operationId: keys.create
+      parameters:
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/keys'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+    put:
+      tags:
+        - keys
+      summary: Patch an existing model instance or insert a new one into the data source.
+      operationId: keys.upsert__put_keys
+      parameters:
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/keys'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+    patch:
+      tags:
+        - keys
+      summary: Patch an existing model instance or insert a new one into the data source.
+      operationId: keys.upsert__patch_keys
+      parameters:
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/keys'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+    get:
+      tags:
+        - keys
+      summary: Find all instances of the model matched by filter from the data source.
+      operationId: keys.find
+      parameters:
+        - name: filter
+          in: query
+          description: 'Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({"something":"value"})'
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/keys'
+      deprecated: false
+  /keys/replaceOrCreate:
+    post:
+      tags:
+        - keys
+      summary: Replace an existing model instance or insert a new one into the data source.
+      operationId: keys.replaceOrCreate
+      parameters:
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/keys'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+  /keys/upsertWithWhere:
+    post:
+      tags:
+        - keys
+      summary: Update an existing model instance or insert a new one into the data source based on the where criteria.
+      operationId: keys.upsertWithWhere
+      parameters:
+        - name: where
+          in: query
+          description: Criteria to match model instances
+          required: false
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          description: An object of model property name/value pairs
+          required: false
+          schema:
+            description: An object of model property name/value pairs
+            $ref: '#/definitions/keys'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+  '/keys/{id}/exists':
+    get:
+      tags:
+        - keys
+      summary: Check whether a model instance exists in the data source.
+      operationId: 'keys.exists__get_keys_{id}_exists'
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+            properties:
+              exists:
+                type: boolean
+      deprecated: false
+  '/keys/{id}':
+    head:
+      tags:
+        - keys
+      summary: Check whether a model instance exists in the data source.
+      operationId: 'keys.exists__head_keys_{id}'
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+            properties:
+              exists:
+                type: boolean
+      deprecated: false
+    get:
+      tags:
+        - keys
+      summary: 'Find a model instance by {{id}} from the data source.'
+      operationId: keys.findById
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+        - name: filter
+          in: query
+          description: 'Filter defining fields and include - must be a JSON-encoded string ({"something":"value"})'
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+    delete:
+      tags:
+        - keys
+      summary: 'Delete a model instance by {{id}} from the data source.'
+      operationId: keys.deleteById
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+      deprecated: false
+    put:
+      tags:
+        - keys
+      summary: Patch attributes for a model instance and persist it into the data source.
+      operationId: 'keys.prototype.updateAttributes__put_keys_{id}'
+      parameters:
+        - name: data
+          in: body
+          description: An object of model property name/value pairs
+          required: false
+          schema:
+            description: An object of model property name/value pairs
+            $ref: '#/definitions/keys'
+        - name: id
+          in: path
+          description: keys id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+    patch:
+      tags:
+        - keys
+      summary: Patch attributes for a model instance and persist it into the data source.
+      operationId: 'keys.prototype.updateAttributes__patch_keys_{id}'
+      parameters:
+        - name: data
+          in: body
+          description: An object of model property name/value pairs
+          required: false
+          schema:
+            description: An object of model property name/value pairs
+            $ref: '#/definitions/keys'
+        - name: id
+          in: path
+          description: keys id
+          required: true
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+  '/keys/{id}/replace':
+    post:
+      tags:
+        - keys
+      summary: Replace attributes for a model instance and persist it into the data source.
+      operationId: keys.replaceById
+      parameters:
+        - name: id
+          in: path
+          description: Model id
+          required: true
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          description: Model instance data
+          required: false
+          schema:
+            description: Model instance data
+            $ref: '#/definitions/keys'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+  /keys/findOne:
+    get:
+      tags:
+        - keys
+      summary: Find first instance of the model matched by filter from the data source.
+      operationId: keys.findOne
+      parameters:
+        - name: filter
+          in: query
+          description: 'Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({"something":"value"})'
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            $ref: '#/definitions/keys'
+      deprecated: false
+  /keys/update:
+    post:
+      tags:
+        - keys
+      summary: 'Update instances of the model matched by {{where}} from the data source.'
+      operationId: keys.updateAll
+      parameters:
+        - name: where
+          in: query
+          description: Criteria to match model instances
+          required: false
+          type: string
+          format: JSON
+        - name: data
+          in: body
+          description: An object of model property name/value pairs
+          required: false
+          schema:
+            description: An object of model property name/value pairs
+            $ref: '#/definitions/keys'
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            description: Information related to the outcome of the operation
+            type: object
+            properties:
+              count:
+                description: The number of instances updated
+                type: number
+                format: double
+      deprecated: false
+  /keys/count:
+    get:
+      tags:
+        - keys
+      summary: Count instances of the model matched by where from the data source.
+      operationId: keys.count
+      parameters:
+        - name: where
+          in: query
+          description: Criteria to match model instances
+          required: false
+          type: string
+          format: JSON
+      responses:
+        '200':
+          description: Request was successful
+          schema:
+            type: object
+            properties:
+              count:
+                type: number
+                format: double
+      deprecated: false
+definitions:
+  keys:
+    properties:
+      name:
+        type: string
+      key:
+        type: string
+      id:
+        type: number
+        format: double
+    required:
+      - name
+      - key
+    additionalProperties: false
+  x-any:
+    properties: {}
+basePath: /api
+swagger: '2.0'
+info:
+  x-ibm-name: amadeus
+  version: 1.0.0
+  title: Amadeus
+schemes:
+  - https
+host: $(catalog.host)
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  clientIdHeader:
+    type: apiKey
+    in: header
+    name: X-IBM-Client-Id
+  clientSecretHeader:
+    in: header
+    name: X-IBM-Client-Secret
+    type: apiKey
+security:
+  - clientIdHeader: []
+    clientSecretHeader: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  catalogs:
+    apic-dev:
+      properties:
+        runtime-url: $(TARGET_URL)
+    sb:
+      properties:
+        runtime-url: 'http://localhost:4001'
+  assembly:
+    execute:
+      - invoke:
+          target-url: $(runtime-url)$(request.path)$(request.search)
