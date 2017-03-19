@@ -1,16 +1,31 @@
 'use strict';
-var AmadeusAPIkey = "khGmpnq38hCbcGKE6PQ9qOFVYgdiJAsv";
+var AmadeusAPIkey = "";
+// CONFIG - LOCAL SERVER (Loopback project)
+var host = "http://127.0.0.1";
+var port = ":4006";
+// DATA STORAGE VARIABLES
 var airlinesDict, airportsDict;
 var departureLocation = "";
+// WHEN THE DOM IS READY
 $(document).ready(function () {
     initDatepicker();
     loadDictionaries();
+    getAPIkey();
     $("#btn-search").click(function (e) {
         e.preventDefault();
+        $("#results").toggle(false);
         $("#results").empty();
         search();
     });
 });
+// SECURITY FEATURE - get Amadeus key stored on a remote server
+function getAPIkey() {
+    var endpointURL = host + port;
+    $.get(endpointURL + '/get-key', function (data) {
+        AmadeusAPIkey = data.key;
+        console.log(AmadeusAPIkey);
+    });
+}
 // DATEPICKER - SETUP & OPTIONS
 function initDatepicker() {
     $("#datepicker").datepicker();
@@ -66,7 +81,8 @@ $(function () {
 });
 // API CALL - Inspiration Search
 function search() {
-    var endpointURL = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search";
+    //var endpointURL = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search";
+    var endpointURL = host + port + '/get-results';
     var origin = $("#airport").val();
     var duration = getDuration();
     var budget = $("#maxPrice").val();
@@ -76,8 +92,7 @@ function search() {
         url: endpointURL
         , dataType: "json"
         , data: {
-            apikey: AmadeusAPIkey
-            , origin: origin
+            origin: origin
             , departure_date: departureRange
             , duration: duration
             , max_price: budget
@@ -101,6 +116,7 @@ function getDuration() {
 }
 
 function displayResults(res) {
+    console.log(res);
     var currency = res.currency;
     var results = res.results;
     var numberOfResults = results.length;
@@ -129,8 +145,7 @@ function displayResults(res) {
 
 function handleError(jqXHR, textStatus, errorThrown) {
     $(".loader").hide();
-    console.error(jqXHR.statusText + " " + jqXHR.status + " : " + jqXHR.responseJSON.message);
-    alert(jqXHR.responseJSON.message);
+    alert("No results found");
 }
 // LOAD AIRPORTS/AIRLINES JSON TO MATCH RESULTS SENT BY THE API
 function loadDictionaries() {
